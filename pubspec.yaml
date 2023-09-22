@@ -1,0 +1,15 @@
+name: communication_channels
+description: A starting point for Dart libraries or applications. # TODO : update
+version: 1.0.0
+# repository: https://github.com/my_org/my_repo # TODO : update
+
+environment:
+  sdk: ^3.1.0
+
+dependencies:
+  easy_serialization: ^1.0.1
+  equatable: ^2.0.5
+
+dev_dependencies:
+  lints: ^2.0.0
+  test: ^1.21.0

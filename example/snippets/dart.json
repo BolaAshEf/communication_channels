@@ -1,0 +1,36 @@
+{
+	"Create Channel Function": {
+		"prefix": "cft",
+		"body": [
+			"/// TODO : add $1.config, to your function configs list.",
+			"class $1 extends ChannelFunction$2{",
+			"  @override",
+			"  late final List<Prop> args = [];",
+			"  ",
+			"  $1() : super.to(",
+			"    toChannel: $3,",
+			"  ){",
+			"    /// add props",
+			"  }",
+			"  ",
+			"  @override",
+			"  TypeAsync$2 callFunWithArgs() async {",
+			"    /// do functionality.$0",
+			"  }",
+			"  ",
+			"  //*////////////////////////// DO NOT MODIFY THIS SECTION BY HAND //////////////////////////*//",
+			"  ",
+			"  @override",
+			"  ChannelFunctionConfig getConfig() => config;",
+			"  static final config = ChannelFunctionConfig<$1>(",
+			"    templateFunction: $1._temp,",
+			"    fromMarkup: $1.fromJson,",
+			"  );",
+			"  $1._temp() : super.temp();",
+			"  $1.fromJson(Map<String, dynamic> json) : super.fromJson(json);",
+			"}"
+		],
+		"description": "Create Channel Function Template."
+	}
+}
+	

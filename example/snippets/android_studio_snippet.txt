@@ -1,0 +1,27 @@
+/// TODO : add $FunctionName$.config, to your function configs list.
+class $FunctionName$ extends ChannelFunction$FunctionRetType${
+  @override
+  late final List<Prop> args = [];
+
+  $FunctionName$() : super.to(
+    toChannel: $ToChannel$,
+  ){
+    /// add props
+  }
+
+  @override
+  TypeAsync$FunctionRetType$ callFunWithArgs() async {
+    /// do functionality.
+  }
+
+  //*////////////////////////// DO NOT MODIFY THIS SECTION BY HAND //////////////////////////*//
+
+  @override
+  ChannelFunctionConfig getConfig() => config;
+  static final config = ChannelFunctionConfig<$FunctionName$>(
+    templateFunction: $FunctionName$._temp,
+    fromMarkup: $FunctionName$.fromJson,
+  );
+  $FunctionName$._temp() : super.temp();
+  $FunctionName$.fromJson(Map<String, dynamic> json) : super.fromJson(json);
+}
