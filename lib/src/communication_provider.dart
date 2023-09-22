@@ -1,11 +1,11 @@
 part of 'channels_flow.dart';
 
-
-abstract class ProviderSender with EquatableMixin{
+abstract class ProviderSender with EquatableMixin {
   const ProviderSender();
   Future<bool> send(SentChannelMessageType msg);
 }
-abstract class ComProvider<S extends ProviderSender> with EquatableMixin{
+
+abstract class ComProvider<S extends ProviderSender> with EquatableMixin {
   abstract final S sender;
 
   /// The main receiver stream that receives valid channel messages that are sent to us.
@@ -19,7 +19,9 @@ abstract class ComProvider<S extends ProviderSender> with EquatableMixin{
   void _setChannel(ChannelType channel) => _forChannel = channel;
 
   Future<bool> send(ChannelMessage msg) async {
-    if(msg.toChannel._provider.runtimeType != runtimeType){return false;}
+    if (msg.toChannel._provider.runtimeType != runtimeType) {
+      return false;
+    }
 
     return msg.toChannel._provider.sender.send(msg.toJson());
   }
@@ -35,26 +37,34 @@ abstract class ComProvider<S extends ProviderSender> with EquatableMixin{
   Future<Stream<SentChannelMessageType>> getReceiverBroadcastStream();
 
   Future<Stream<ChannelMessage>> _getValidChannelMessagesStream() async {
-    return (await getReceiverBroadcastStream()).takeWhile((msg){
-      late final ChannelType? toChannel;
-      toChannel = ChannelMessage._getToChannel(msg);
-      if(toChannel != _forChannel){
-        return false;
-      }
+    return (await getReceiverBroadcastStream())
+        .takeWhile((msg) {
+          late final ChannelType? toChannel;
+          toChannel = ChannelMessage._getToChannel(msg);
+          if (toChannel != _forChannel) {
+            return false;
+          }
 
-      return true;
-    }).map((msg){
-      try{
-        final channelMessage = _decodeChannelMessageFromJson(json: msg);
-        if(channelMessage == null){return null;}
-        return channelMessage;
-      }catch(ex){
-        return null;
-        // TODO
-        //throw const ChannelError(r"Unable to decode this message, "
-        //r"please make sure not to interfere with the decoding process from outside.");
-      }
-    }).takeWhile((channelMessage) => channelMessage != null,).cast<ChannelMessage>();
+          return true;
+        })
+        .map((msg) {
+          try {
+            final channelMessage = _decodeChannelMessageFromJson(json: msg);
+            if (channelMessage == null) {
+              return null;
+            }
+            return channelMessage;
+          } catch (ex) {
+            return null;
+            // TODO
+            //throw const ChannelError(r"Unable to decode this message, "
+            //r"please make sure not to interfere with the decoding process from outside.");
+          }
+        })
+        .takeWhile(
+          (channelMessage) => channelMessage != null,
+        )
+        .cast<ChannelMessage>();
   }
 
   Future<void> close() async {
@@ -67,12 +77,11 @@ abstract class ComProvider<S extends ProviderSender> with EquatableMixin{
 
   Future<void> closeStreamObj();
 
-
   @override
   List<Object?> get props => [sender];
 }
 
-class _DummySender extends ProviderSender{
+class _DummySender extends ProviderSender {
   const _DummySender();
 
   @override
@@ -81,46 +90,51 @@ class _DummySender extends ProviderSender{
   @override
   List<Object?> get props => [];
 }
-class _DummyComProvider extends ComProvider<_DummySender>{
+
+class _DummyComProvider extends ComProvider<_DummySender> {
   @override
   final sender = const _DummySender();
 
   _DummyComProvider();
 
   @override
-  Future<Stream<SentChannelMessageType>> getReceiverBroadcastStream() async => 
-    const Stream.empty();
+  Future<Stream<SentChannelMessageType>> getReceiverBroadcastStream() async =>
+      const Stream.empty();
 
   @override
   Future<void> closeStreamObj() async {}
 }
 
-class SocketSender extends ProviderSender{
+class SocketSender extends ProviderSender {
   static const _timeout = Duration(milliseconds: 500);
 
   final dynamic host;
   final int port;
   final Encoding encoding;
 
-  const SocketSender(this.host, this.port, [this.encoding = utf8]) : assert(
-    (host is String || host is InternetAddress) && port > 0,
-  );
+  const SocketSender(this.host, this.port, [this.encoding = utf8])
+      : assert(
+          (host is String || host is InternetAddress) && port > 0,
+        );
 
   @override
   Future<bool> send(SentChannelMessageType msg) async {
-    try{
+    try {
       final channelSocketTask = await Socket.startConnect(host, port);
       final res = await Future.any([
         Future(() async {
-          try{
+          try {
             return await channelSocketTask.socket;
-          }catch(ex){
+          } catch (ex) {
             return null;
           }
         }),
-        Future.delayed(_timeout, () => null,),
+        Future.delayed(
+          _timeout,
+          () => null,
+        ),
       ]);
-      if(res == null){
+      if (res == null) {
         channelSocketTask.cancel();
         return false;
       }
@@ -130,15 +144,19 @@ class SocketSender extends ProviderSender{
       channelSocket.write(jsonEncode(msg));
       await channelSocket.close();
       return true;
-    }catch(ex){
+    } catch (ex) {
       return false;
     }
   }
 
   @override
-  List<Object?> get props => [host, port,];
+  List<Object?> get props => [
+        host,
+        port,
+      ];
 }
-class SocketComProvider extends ComProvider<SocketSender>{
+
+class SocketComProvider extends ComProvider<SocketSender> {
   static const bool shared = false;
 
   dynamic get host => sender.host;
@@ -151,16 +169,15 @@ class SocketComProvider extends ComProvider<SocketSender>{
   ServerSocket? _server;
   StreamController<SentChannelMessageType>? _controller;
 
-  SocketComProvider({
-    required dynamic host,
-    required int port,
-    Encoding encoding = utf8
-  }) : sender = SocketSender(host, port, encoding);
+  SocketComProvider(
+      {required dynamic host, required int port, Encoding encoding = utf8})
+      : sender = SocketSender(host, port, encoding);
 
   @override
   Future<Stream<SentChannelMessageType>> getReceiverBroadcastStream() async {
     _server = await ServerSocket.bind(
-      host, port,
+      host,
+      port,
       shared: shared,
     );
 
@@ -169,17 +186,16 @@ class SocketComProvider extends ComProvider<SocketSender>{
       client.listen((Uint8List data) async {
         final strMsg = encoding.decode(data);
 
-        try{
+        try {
           final msgObj = jsonDecode(strMsg);
-          if(msgObj is SentChannelMessageType){
+          if (msgObj is SentChannelMessageType) {
             _controller?.add(msgObj);
           }
-        }catch(ex){
+        } catch (ex) {
           // do NOT add it to stream.
         }
       });
     });
-
 
     return _controller!.stream;
   }

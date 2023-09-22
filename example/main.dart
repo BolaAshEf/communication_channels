@@ -7,7 +7,6 @@ import 'dart:isolate';
 
 import 'package:easy_serialization/easy_serialization.dart';
 
-
 // Define the channels you will work with, and use the type of provider
 // you want to send the data with.
 // Here we use Sockets.
@@ -17,13 +16,21 @@ import 'package:easy_serialization/easy_serialization.dart';
 //    BUT they must provide unique parameters to it.
 
 final mainChannel = ChannelType(
-  code: 0, debugName: "MAIN",
-  provider: SocketComProvider(host: InternetAddress.tryParse("127.0.0.1"), port: 5000,),
+  code: 0,
+  debugName: "MAIN",
+  provider: SocketComProvider(
+    host: InternetAddress.tryParse("127.0.0.1"),
+    port: 5000,
+  ),
 );
 
 final isolateChannel = ChannelType(
-  code: 1, debugName: "ISOLATE",
-  provider: SocketComProvider(host: InternetAddress.tryParse("127.0.0.1"), port: 5001,),
+  code: 1,
+  debugName: "ISOLATE",
+  provider: SocketComProvider(
+    host: InternetAddress.tryParse("127.0.0.1"),
+    port: 5001,
+  ),
 );
 
 /// Pass all channels you have defined here.
@@ -33,8 +40,6 @@ final allAvailableChannelFunctions = <ChannelFunctionConfig>[
   PrintIsolateHashCode.config,
   CircleTheShapes.config,
 ];
-
-
 
 /// This is commented in details in the example of `easy_serialization` Package.
 final customSerializableObjects = <SerializationConfig>[
@@ -48,16 +53,14 @@ final customSerializableObjects = <SerializationConfig>[
       markup["dy"],
     ),
   ),
-
   ShapeFillType.values.config,
-
   SerializationConfig.abstract<Shape>(),
   SerializationConfig.serializable<Circle>(Circle.fromMarkup),
   SerializationConfig.serializable<Rectangle>(Rectangle.fromMarkup),
   SerializationConfig.serializable<Square>(Square.fromMarkup),
 ];
 
-/// Try to call the function that in it you register [Prop], [ChannelFunction] 
+/// Try to call the function that in it you register [Prop], [ChannelFunction]
 /// and initializing the channel at FIRST in any new isolate(channel)
 /// you want to communicate with.
 Future<void> initChannelCommunications(ChannelType channel) async {
@@ -74,7 +77,6 @@ Future<void> initChannelCommunications(ChannelType channel) async {
     definitions: channelsDefinitions,
   );
 }
-
 
 void main() async {
   print("Main hashcode ${Isolate.current.hashCode}");
@@ -103,7 +105,7 @@ void isolateMain(String str) async {
 
   // call at FIRST.
   await initChannelCommunications(isolateChannel);
-  
+
   final rect = Rectangle(10, 10)
     ..fill = ShapeFillType.outlined
     ..offset = Offset(10, 10);
@@ -124,22 +126,21 @@ void isolateMain(String str) async {
   await ThisChannel().deAttach();
 }
 
-
 //*/////////////////////// The channel functions ///////////////////////*//
 
 // You can create them easily with the snippets I provide for you.
 
-
 /// This function shows you that [callFunWithArgs] is executed in [isolateChannel].
-/// 
+///
 /// It also returns the [hashCode] of [isolateChannel].
-class PrintIsolateHashCode extends ChannelFunction<int>{
+class PrintIsolateHashCode extends ChannelFunction<int> {
   @override
   late final List<Prop> args = [];
 
-  PrintIsolateHashCode() : super.to(
-    toChannel: isolateChannel,
-  );
+  PrintIsolateHashCode()
+      : super.to(
+          toChannel: isolateChannel,
+        );
 
   @override
   TypeAsync<int> callFunWithArgs() async => Isolate.current.hashCode;
@@ -153,16 +154,16 @@ class PrintIsolateHashCode extends ChannelFunction<int>{
     fromMarkup: PrintIsolateHashCode.fromJson,
   );
   PrintIsolateHashCode._temp() : super.temp();
-  PrintIsolateHashCode.fromJson(Map<String, dynamic> json) : super.fromJson(json);
+  PrintIsolateHashCode.fromJson(Map<String, dynamic> json)
+      : super.fromJson(json);
 }
-
 
 /// Here we pass the shapes and send them to [mainChannel],
 /// then we will return back the [List<Circle>] that have the same area as that shape.
-/// 
+///
 /// Obviously we can do that in the same isolate, but we do that to show the IDEA
-/// of executing code in different channel, sending and recieving to or from any channel. 
-class CircleTheShapes extends ChannelFunction<List<Circle>>{
+/// of executing code in different channel, sending and recieving to or from any channel.
+class CircleTheShapes extends ChannelFunction<List<Circle>> {
   ///> here we define the arguments of the function.
   final _shapes = Prop<List<Shape>>.list([]);
 
@@ -172,12 +173,12 @@ class CircleTheShapes extends ChannelFunction<List<Circle>>{
     _shapes,
   ];
 
-  ///> pass your argument to the function constructor. 
+  ///> pass your argument to the function constructor.
   CircleTheShapes({
     required List<Shape> shapes,
   }) : super.to(
-    toChannel: mainChannel,
-  ){
+          toChannel: mainChannel,
+        ) {
     ///> initialize the data.
     _shapes.data = shapes;
   }
@@ -189,13 +190,12 @@ class CircleTheShapes extends ChannelFunction<List<Circle>>{
     /// Here we do the functionality.
 
     /// Here we use our [_shapes] prop.
-    return _shapes.data.map((shape){
+    return _shapes.data.map((shape) {
       final r = sqrt(shape.area() / 3.14);
 
       return Circle(r);
     }).toList();
   }
-
 
   ///> in case of returning a [List] we must provide an empty instance.
   @override
@@ -212,16 +212,6 @@ class CircleTheShapes extends ChannelFunction<List<Circle>>{
   CircleTheShapes._temp() : super.temp();
   CircleTheShapes.fromJson(Map<String, dynamic> json) : super.fromJson(json);
 }
-
-
-
-
-
-
-
-
-
-
 
 //*/////////////////////// Types that can be sent through channels ///////////////////////*//
 

@@ -8,10 +8,10 @@ class ChannelError<OBJ extends Object> implements Exception {
   String toString() => errorObj.toString();
 }
 
-class ChannelWrongResult extends ChannelError<ChannelResultType>{
+class ChannelWrongResult extends ChannelError<ChannelResultType> {
   const ChannelWrongResult(super.errorObj);
 }
 
-class ChannelExceptionResult extends ChannelError<ResultErrorType>{
+class ChannelExceptionResult extends ChannelError<ResultErrorType> {
   const ChannelExceptionResult(super.errorObj);
 }

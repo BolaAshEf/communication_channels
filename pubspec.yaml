@@ -1,7 +1,7 @@
 name: communication_channels
-description: A starting point for Dart libraries or applications. # TODO : update
+description: This package is used to make the communication process between isolates(services) more maintainable and systematic.
 version: 1.0.0
-# repository: https://github.com/my_org/my_repo # TODO : update
+repository: https://github.com/BolaAshEf/communication_channels
 
 environment:
   sdk: ^3.1.0
