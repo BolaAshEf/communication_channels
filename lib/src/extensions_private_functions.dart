@@ -63,7 +63,7 @@ extension RaiseChannelFunctionExtension<Ret extends TypeSync>
     on ChannelFunction<Ret> {
   /// exec this function with this channel
   ChannelResultGenType<Ret> raise() async {
-    return await ThisChannel()._raiseMessage<Ret>(this);
+    return await ThisChannel().raiseMessage<Ret>(this);
   }
 
   Stream<ChannelResult<Ret>> broadcastStream() async* {

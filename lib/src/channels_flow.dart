@@ -13,6 +13,7 @@ part 'channel_exceptions.dart';
 part 'extensions_private_functions.dart';
 part 'communication_provider.dart';
 
+
 // TODO : add support to passing the receive port directly and us it.
 // TODO : add support to disable the serializable configurations and send objects directly(in case of same code isolate).
 
@@ -186,7 +187,7 @@ abstract class _BaseAppChannels {
   });
 
   /// Raise any Channel Message from any channel.
-  ChannelResultGenType<Ret> _raiseMessage<Ret extends TypeSync>(
+  ChannelResultGenType<Ret> raiseMessage<Ret extends TypeSync>(
       ChannelMessage channelMessage);
 
   /// Get new message identifier to send the message through channels
@@ -364,7 +365,7 @@ mixin _ChannelsHandlerMixin on _BaseAppChannels {
   }
 
   @override
-  ChannelResultGenType<Ret> _raiseMessage<Ret extends TypeSync>(
+  ChannelResultGenType<Ret> raiseMessage<Ret extends TypeSync>(
       ChannelMessage channelMessage) async {
     final toChannel = channelMessage._toChannel;
 

@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_final_fields
+
 part of 'channels_flow.dart';
 
 /// The type of Message

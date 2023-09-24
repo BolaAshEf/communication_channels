@@ -51,6 +51,8 @@ abstract class ChannelFunction<Ret extends TypeSync> extends ChannelMessage {
 
   ChannelFunctionConfig getConfig();
 
+
+
   static ChannelFunction _decodeFromJson(Map<String, dynamic> json) {
     final funTypeID =
         TypeID.fromMarkup(json[_channelFunctionTypeIDPropMarkupPropName]);
@@ -151,5 +153,5 @@ class ChannelFunctionConfig<FUN extends ChannelFunction> with TypeHash<FUN> {
     ensureCalcTypeID();
   }
 
-  FUN get _singleton => _template ?? (_template = _templateFunction());
+  FUN get singleton => _template ?? (_template = _templateFunction());
 }
